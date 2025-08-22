@@ -1,0 +1,90 @@
+{
+  "project_info": {
+    "project_number": "661257831415",
+    "project_id": "flutter-firebase-44247",
+    "storage_bucket": "flutter-firebase-44247.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:661257831415:android:9d6a6f4940569a624524f2",
+        "android_client_info": {
+          "package_name": "com.example.users"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "661257831415-in74u67h7e89vdc829t2h0ti0kitd3i6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAtDZC9xOGfJY8U7Lht0-wcuyswxsLiBCA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "661257831415-in74u67h7e89vdc829t2h0ti0kitd3i6.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "661257831415-mnp75q3sjov5huv84chh0busugtfm92p.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.flutterFirebase"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:661257831415:android:4fee46db7ce3f4e04524f2",
+        "android_client_info": {
+          "package_name": "com.example.zoom_clone"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "661257831415-i9i17pffk7074j4bld0vt7t2noqj60tc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.zoom_clone",
+            "certificate_hash": "280c62cb4fdf3d45170b3b85da3f8cc6116df193"
+          }
+        },
+        {
+          "client_id": "661257831415-in74u67h7e89vdc829t2h0ti0kitd3i6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAtDZC9xOGfJY8U7Lht0-wcuyswxsLiBCA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "661257831415-in74u67h7e89vdc829t2h0ti0kitd3i6.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "661257831415-mnp75q3sjov5huv84chh0busugtfm92p.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.flutterFirebase"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
