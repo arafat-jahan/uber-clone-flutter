@@ -1,10 +1,13 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:users/screens/main_page.dart';
 import 'package:users/screens/register_screen.dart';
 import 'package:users/themeProvider/theme_provider.dart';
 
-void main() {
+ Future<void> main() async{
   runApp(const MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
 }
 
 class MyApp extends StatelessWidget {

@@ -26,43 +26,46 @@ class _RegisterScreenState extends State<RegisterScreen> {
   // Declare a global key for form
   final _formKey = GlobalKey<FormState>();
 
-void _submit() async{
-  // validated all the form fields
-if(_formKey.currentState!.validate()){
-await firebaseAuth.createUserWithEmailAndPassword(
-    email:emailTextEditingController.text.trim() , password: passwordTextEditingController.text.trim()
-).then((auth) async{
-  currnetUser = auth.user;
-  if(currnetUser != null){
-    Map userMap = {
-      "id": currnetUser!.uid,
-      "name": nameTextEditingController.text.trim(),
-      "email": emailTextEditingController.text.trim(),
-      "address": addressTextEditingController.text.trim(),
-      "phone": phoneTextEditingController.text.trim(),
-    };
+  /// ✅ Submit function
+  void _submit() async {
+    if (_formKey.currentState!.validate()) {
+      try {
+        final authResult = await firebaseAuth.createUserWithEmailAndPassword(
+          email: emailTextEditingController.text.trim(),
+          password: passwordTextEditingController.text.trim(),
+        );
 
-    DatabaseReference userRef = FirebaseDatabase.instance.ref().child("users");
-    userRef.child(currnetUser! .uid).set(userMap);
+        currnetUser = authResult.user;
 
+        if (currnetUser != null) {
+          Map userMap = {
+            "id": currnetUser!.uid,
+            "name": nameTextEditingController.text.trim(),
+            "email": emailTextEditingController.text.trim(),
+            "address": addressTextEditingController.text.trim(),
+            "phone": phoneTextEditingController.text.trim(),
+          };
 
+          DatabaseReference userRef =
+          FirebaseDatabase.instance.ref().child("users");
+          await userRef.child(currnetUser!.uid).set(userMap);
+
+          await Fluttertoast.showToast(msg: "✅ Successfully Registered");
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (c) => MainScreen()));
+        }
+      } catch (error) {
+        Fluttertoast.showToast(msg: "❌ Error occurred: \n $error");
+      }
+    } else {
+      Fluttertoast.showToast(msg: "⚠️ Not all fields are valid");
+    }
   }
-  await Fluttertoast.showToast(msg: "Successfully Registered");
-  Navigator.push(context, MaterialPageRoute(builder: (c) => MainScreen()));
-
-}).catchError((errorMessage){
-  Fluttertoast.showToast(msg: "Error occurred: \n $errorMessage");
-});
-}
-else{
-  Fluttertoast.showToast(msg: "Not all field are valid");
-}
-
-}
 
   @override
   Widget build(BuildContext context) {
-    bool darkTheme = MediaQuery.of(context).platformBrightness == Brightness.dark;
+    bool darkTheme =
+        MediaQuery.of(context).platformBrightness == Brightness.dark;
 
     return GestureDetector(
       onTap: () {
@@ -74,8 +77,10 @@ else{
           children: [
             Column(
               children: [
-                Image.asset(darkTheme ? 'images/city_dark.png' : 'images/city.png'),
-                SizedBox(height: 20),
+                Image.asset(darkTheme
+                    ? 'images/city_dark.png'
+                    : 'images/city.png'),
+                const SizedBox(height: 20),
                 Text(
                   'Register',
                   style: TextStyle(
@@ -87,30 +92,32 @@ else{
                 Padding(
                   padding: const EdgeInsets.fromLTRB(15, 20, 15, 50),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Form(
-                        key: _formKey, // ✅ Add form key
+                        key: _formKey,
                         child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             // Name Field
                             TextFormField(
                               controller: nameTextEditingController,
-                              inputFormatters: [LengthLimitingTextInputFormatter(50)],
+                              inputFormatters: [
+                                LengthLimitingTextInputFormatter(50)
+                              ],
                               decoration: InputDecoration(
                                 hintText: "Name",
-                                hintStyle: TextStyle(color: Colors.grey),
                                 filled: true,
-                                fillColor: darkTheme ? Colors.black45 : Colors.grey.shade200,
+                                fillColor: darkTheme
+                                    ? Colors.black45
+                                    : Colors.grey.shade200,
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(40),
                                   borderSide: BorderSide.none,
                                 ),
-                                prefixIcon: Icon(Icons.person, color: darkTheme ? Colors.amber.shade400 : Colors.grey),
+                                prefixIcon: Icon(Icons.person,
+                                    color: darkTheme
+                                        ? Colors.amber.shade400
+                                        : Colors.grey),
                               ),
-                              autovalidateMode: AutovalidateMode.onUserInteraction,
                               validator: (text) {
                                 if (text == null || text.isEmpty) {
                                   return "Name can't be empty";
@@ -118,117 +125,120 @@ else{
                                 if (text.length < 2) {
                                   return "Please enter a valid name";
                                 }
-                                if (text.length > 50) {
-                                  return "Name can't be more than 50 characters";
-                                }
                                 return null;
                               },
                             ),
-                            SizedBox(height: 10),
+                            const SizedBox(height: 10),
 
                             // Email Field
                             TextFormField(
                               controller: emailTextEditingController,
-                              inputFormatters: [LengthLimitingTextInputFormatter(100)],
                               decoration: InputDecoration(
                                 hintText: "Email",
-                                hintStyle: TextStyle(color: Colors.grey),
                                 filled: true,
-                                fillColor: darkTheme ? Colors.black45 : Colors.grey.shade200,
+                                fillColor: darkTheme
+                                    ? Colors.black45
+                                    : Colors.grey.shade200,
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(40),
                                   borderSide: BorderSide.none,
                                 ),
-                                prefixIcon: Icon(Icons.email, color: darkTheme ? Colors.amber.shade400 : Colors.grey),
+                                prefixIcon: Icon(Icons.email,
+                                    color: darkTheme
+                                        ? Colors.amber.shade400
+                                        : Colors.grey),
                               ),
-                              autovalidateMode: AutovalidateMode.onUserInteraction,
                               validator: (text) {
                                 if (text == null || text.isEmpty) {
                                   return "Email can't be empty";
                                 }
-                                if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(text)) {
+                                if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                                    .hasMatch(text)) {
                                   return "Please enter a valid email";
-                                }
-                                if (text.length > 99) {
-                                  return "Email can't be more than 100 characters";
                                 }
                                 return null;
                               },
                             ),
-                            SizedBox(height: 10),
+                            const SizedBox(height: 10),
 
                             // Phone Field
                             IntlPhoneField(
-                              controller: phoneTextEditingController,
-                              showCountryFlag: false,
                               initialCountryCode: 'BD',
-                              dropdownIcon: Icon(
-                                Icons.arrow_drop_down,
-                                color: darkTheme ? Colors.amber.shade400 : Colors.grey,
-                              ),
+                              showCountryFlag: false,
                               decoration: InputDecoration(
                                 hintText: "Phone",
-                                hintStyle: TextStyle(color: Colors.grey),
                                 filled: true,
-                                fillColor: darkTheme ? Colors.black45 : Colors.grey.shade200,
+                                fillColor: darkTheme
+                                    ? Colors.black45
+                                    : Colors.grey.shade200,
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(40),
                                   borderSide: BorderSide.none,
                                 ),
                               ),
                               onChanged: (phone) {
-                                phoneTextEditingController.text = phone.completeNumber;
+                                phoneTextEditingController.text =
+                                    phone.completeNumber;
                               },
-                            ),
-                            SizedBox(height: 10),
-
-                            // Address Field
-                            TextFormField(
-                              controller: addressTextEditingController,
-                              inputFormatters: [LengthLimitingTextInputFormatter(100)],
-                              decoration: InputDecoration(
-                                hintText: "Address",
-                                hintStyle: TextStyle(color: Colors.grey),
-                                filled: true,
-                                fillColor: darkTheme ? Colors.black45 : Colors.grey.shade200,
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(40),
-                                  borderSide: BorderSide.none,
-                                ),
-                                prefixIcon: Icon(Icons.home, color: darkTheme ? Colors.amber.shade400 : Colors.grey),
-                              ),
-                              autovalidateMode: AutovalidateMode.onUserInteraction,
-                              validator: (text) {
-                                if (text == null || text.isEmpty) {
-                                  return "Address can't be empty";
-                                }
-                                if (text.length < 2) {
-                                  return "Please enter a valid address";
+                              validator: (phone) {
+                                if (phone == null || phone.number.isEmpty) {
+                                  return "Phone can't be empty";
                                 }
                                 return null;
                               },
                             ),
-                            SizedBox(height: 20),
+                            const SizedBox(height: 10),
+
+                            // Address Field
+                            TextFormField(
+                              controller: addressTextEditingController,
+                              decoration: InputDecoration(
+                                hintText: "Address",
+                                filled: true,
+                                fillColor: darkTheme
+                                    ? Colors.black45
+                                    : Colors.grey.shade200,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(40),
+                                  borderSide: BorderSide.none,
+                                ),
+                                prefixIcon: Icon(Icons.home,
+                                    color: darkTheme
+                                        ? Colors.amber.shade400
+                                        : Colors.grey),
+                              ),
+                              validator: (text) {
+                                if (text == null || text.isEmpty) {
+                                  return "Address can't be empty";
+                                }
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 20),
 
                             // Password Field
                             TextFormField(
                               controller: passwordTextEditingController,
                               obscureText: !_passwordVisible,
-                              inputFormatters: [LengthLimitingTextInputFormatter(50)],
                               decoration: InputDecoration(
                                 hintText: "Password",
-                                hintStyle: TextStyle(color: Colors.grey),
                                 filled: true,
-                                fillColor: darkTheme ? Colors.black45 : Colors.grey.shade200,
+                                fillColor: darkTheme
+                                    ? Colors.black45
+                                    : Colors.grey.shade200,
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(40),
                                   borderSide: BorderSide.none,
                                 ),
-                                prefixIcon: Icon(Icons.lock, color: darkTheme ? Colors.amber.shade400 : Colors.grey),
+                                prefixIcon: Icon(Icons.lock,
+                                    color: darkTheme
+                                        ? Colors.amber.shade400
+                                        : Colors.grey),
                                 suffixIcon: IconButton(
                                   icon: Icon(
-                                    _passwordVisible ? Icons.visibility : Icons.visibility_off,
-                                    color: darkTheme ? Colors.amber.shade400 : Colors.grey,
+                                    _passwordVisible
+                                        ? Icons.visibility
+                                        : Icons.visibility_off,
                                   ),
                                   onPressed: () {
                                     setState(() {
@@ -237,7 +247,6 @@ else{
                                   },
                                 ),
                               ),
-                              autovalidateMode: AutovalidateMode.onUserInteraction,
                               validator: (text) {
                                 if (text == null || text.isEmpty) {
                                   return "Password can't be empty";
@@ -245,42 +254,30 @@ else{
                                 if (text.length < 6) {
                                   return "Password must be at least 6 characters";
                                 }
-                                if (text.length > 50) {
-                                  return "Password can't be more than 50 characters";
-                                }
                                 return null;
                               },
                             ),
-                            SizedBox(height: 20),
+                            const SizedBox(height: 20),
 
                             // Confirm Password Field
                             TextFormField(
                               controller: confirmTextEditingController,
                               obscureText: !_passwordVisible,
-                              inputFormatters: [LengthLimitingTextInputFormatter(50)],
                               decoration: InputDecoration(
                                 hintText: "Confirm Password",
-                                hintStyle: TextStyle(color: Colors.grey),
                                 filled: true,
-                                fillColor: darkTheme ? Colors.black45 : Colors.grey.shade200,
+                                fillColor: darkTheme
+                                    ? Colors.black45
+                                    : Colors.grey.shade200,
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(40),
                                   borderSide: BorderSide.none,
                                 ),
-                                prefixIcon: Icon(Icons.lock, color: darkTheme ? Colors.amber.shade400 : Colors.grey),
-                                suffixIcon: IconButton(
-                                  icon: Icon(
-                                    _passwordVisible ? Icons.visibility : Icons.visibility_off,
-                                    color: darkTheme ? Colors.amber.shade400 : Colors.grey,
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      _passwordVisible = !_passwordVisible;
-                                    });
-                                  },
-                                ),
+                                prefixIcon: Icon(Icons.lock,
+                                    color: darkTheme
+                                        ? Colors.amber.shade400
+                                        : Colors.grey),
                               ),
-                              autovalidateMode: AutovalidateMode.onUserInteraction,
                               validator: (text) {
                                 if (text == null || text.isEmpty) {
                                   return "Confirm Password can't be empty";
@@ -291,36 +288,37 @@ else{
                                 return null;
                               },
                             ),
-                            SizedBox(height: 20),
+                            const SizedBox(height: 20),
 
                             // Register Button
                             ElevatedButton(
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: darkTheme ? Colors.amber.shade400 : Colors.blue,
-                                foregroundColor: darkTheme ? Colors.black : Colors.white,
-                                elevation: 0,
+                                backgroundColor: darkTheme
+                                    ? Colors.amber.shade400
+                                    : Colors.blue,
+                                foregroundColor: darkTheme
+                                    ? Colors.black
+                                    : Colors.white,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(32),
                                 ),
-                                minimumSize: Size(double.infinity, 50),
+                                minimumSize: const Size(double.infinity, 50),
                               ),
-
-                              onPressed: () {
-                                if (_formKey.currentState!.validate()) {
-                                  // Proceed with registration
-                                }
-                              },
-                              child: Text(
-                                'Register',
-                                style: TextStyle(fontSize: 20),
-                              ),
+                              onPressed: _submit, // ✅ Fixed
+                              child: const Text('Register',
+                                  style: TextStyle(fontSize: 20)),
                             ),
+
+
+
 
                             SizedBox(height: 20),
 
-                            // Forgot Password
+// Forgot Password
                             GestureDetector(
-                              onTap: () {},
+                              onTap: () {
+                                // Forgot password action here
+                              },
                               child: Text(
                                 'Forgot Password?',
                                 style: TextStyle(
@@ -328,8 +326,10 @@ else{
                                 ),
                               ),
                             ),
-                            SizedBox(height: 20,),
 
+                            SizedBox(height: 20),
+
+// Sign In option
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -340,23 +340,22 @@ else{
                                     fontSize: 15,
                                   ),
                                 ),
-                                SizedBox(width: 5,),
+                                SizedBox(width: 5),
                                 GestureDetector(
-                                  onTap: (){
-
+                                  onTap: () {
+                                    // Navigate to Sign In screen here
                                   },
                                   child: Text(
                                     'Sign In',
                                     style: TextStyle(
                                       fontSize: 15,
                                       color: darkTheme ? Colors.amber.shade400 : Colors.blue,
-
                                     ),
                                   ),
-                                )
-
+                                ),
                               ],
-                            )
+                            ),
+
                           ],
                         ),
                       ),
