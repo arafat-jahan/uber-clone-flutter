@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:users/screens/login_screen.dart';
 import 'package:users/screens/main_page.dart';
 import 'package:users/screens/register_screen.dart';
 import 'package:users/themeProvider/theme_provider.dart';
@@ -24,7 +25,7 @@ class MyApp extends StatelessWidget {
 
       debugShowCheckedModeBanner: false,
 
-      home: RegisterScreen(),
+      home: LoginScreen(),
     );
   }
 }
