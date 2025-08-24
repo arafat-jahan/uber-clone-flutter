@@ -1,56 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:users/screens/forgot_password_screen.dart';
+import 'package:users/global/golbal.dart';
 
-import '../global/golbal.dart';
-import 'main_page.dart';
-
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class ForgotPasswordScreen extends StatefulWidget {
+  const ForgotPasswordScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final emailTextEditingController = TextEditingController();
-  final passwordTextEditingController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
-  bool _passwordVisible = false; // Password visibility toggle
-
-  void _submit() async {
-    if (_formKey.currentState!.validate()) {
-      try {
-        final authResult = await firebaseAuth.signInWithEmailAndPassword(
-          email: emailTextEditingController.text.trim(),
-          password: passwordTextEditingController.text.trim(),
-        );
-
-        currnetUser = authResult.user; // spelling fix ✅
-
-        await Fluttertoast.showToast(msg: "✅ Successfully Logged In");
-
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (c) => const MainScreen()),
-        );
-      } catch (error) {
-        Fluttertoast.showToast(msg: "❌ Error occurred: \n $error");
-      }
-    } else {
-      Fluttertoast.showToast(msg: "⚠️ Not all fields are valid");
-    }
+  void _submit() {
+    firebaseAuth
+        .sendPasswordResetEmail(
+      email: emailTextEditingController.text.trim(),
+    )
+        .then((value) {
+      Fluttertoast.showToast(
+        msg:
+        "We have sent you an email to reset your password. Please check your inbox.",
+      );
+    }).onError((error, stackTrace) {
+      Fluttertoast.showToast(
+        msg: "Error Occurred:\n${error.toString()}",
+      );
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final bool darkTheme =
+    bool darkTheme =
         MediaQuery.of(context).platformBrightness == Brightness.dark;
 
     return GestureDetector(
       onTap: () {
-        FocusScope.of(context).unfocus();
+        FocusScope.of(context).unfocus(); // keyboard dismiss
       },
       child: Scaffold(
         body: ListView(
@@ -58,18 +45,23 @@ class _LoginScreenState extends State<LoginScreen> {
           children: [
             Column(
               children: [
+                // Top image
                 Image.asset(
                   darkTheme ? 'images/city_dark.png' : 'images/city.png',
                 ),
                 const SizedBox(height: 20),
+
+                // Screen title
                 Text(
-                  'Login',
+                  'Forgot Password',
                   style: TextStyle(
                     color: darkTheme ? Colors.amber.shade400 : Colors.blue,
                     fontSize: 25,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+
+                // Form section
                 Padding(
                   padding: const EdgeInsets.fromLTRB(15, 20, 15, 50),
                   child: Form(
@@ -107,54 +99,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             return null;
                           },
                         ),
-                        const SizedBox(height: 10),
-
-                        // Password Field
-                        TextFormField(
-                          controller: passwordTextEditingController,
-                          obscureText: !_passwordVisible,
-                          decoration: InputDecoration(
-                            hintText: "Password",
-                            filled: true,
-                            fillColor: darkTheme
-                                ? Colors.black45
-                                : Colors.grey.shade200,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(40),
-                              borderSide: BorderSide.none,
-                            ),
-                            prefixIcon: Icon(
-                              Icons.lock,
-                              color: darkTheme
-                                  ? Colors.amber.shade400
-                                  : Colors.grey,
-                            ),
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                _passwordVisible
-                                    ? Icons.visibility
-                                    : Icons.visibility_off,
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  _passwordVisible = !_passwordVisible;
-                                });
-                              },
-                            ),
-                          ),
-                          validator: (text) {
-                            if (text == null || text.isEmpty) {
-                              return "Password can't be empty";
-                            }
-                            if (text.length < 6) {
-                              return "Password must be at least 6 characters";
-                            }
-                            return null;
-                          },
-                        ),
                         const SizedBox(height: 20),
 
-                        // Login Button
+                        // Reset Password Button
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: darkTheme
@@ -167,35 +114,19 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             minimumSize: const Size(double.infinity, 50),
                           ),
-                          onPressed: _submit,
+                          onPressed: () {
+                            if (_formKey.currentState!.validate()) {
+                              _submit();
+                            }
+                          },
                           child: const Text(
-                            'Login',
+                            'Reset Password',
                             style: TextStyle(fontSize: 20),
                           ),
                         ),
                         const SizedBox(height: 20),
 
-                        // Forgot Password
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (c) => const ForgotPasswordScreen()),
-                            );
-                          },
-                          child: Text(
-                            "Forgot Password?",
-                            style: TextStyle(
-                              color: darkTheme
-                                  ? Colors.amber.shade400
-                                  : Colors.blue,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-
-                        // Register option
+                        // Sign Up option
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -209,8 +140,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             const SizedBox(width: 5),
                             GestureDetector(
                               onTap: () {
-                                // এখানে RegisterScreen এ navigate করতে হবে
-                                // উদাহরণ: Navigator.push(context, MaterialPageRoute(builder: (c) => const RegisterScreen()));
+                                // Navigate to Sign Up screen
                               },
                               child: Text(
                                 'Register',
